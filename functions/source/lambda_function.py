@@ -59,26 +59,17 @@ def get_all_vpn_routes(dashboard, org_id, vmx1_id, vmx2_id):
     vpn_routes_vmx1 = []
     vpn_routes_vmx2 = []
     for networks in org_vpn_status:
-        if networks['vpnMode'] == 'spoke': 
-            for peers in networks['merakiVpnPeers']:
-                if peers['networkId'] == vmx1_id or peers['networkId'] == vmx2_id:
-                    vpn_status = dashboard.appliance.getNetworkApplianceVpnSiteToSiteVpn(networks['networkId'])
-                    for i in vpn_status['hubs']:
-                        if i['hubId'] == vmx1_id:
-                            for subnets in networks['exportedSubnets']:
-                                logger.info('Meraki Dashboard: Found routes for vMX1 hub')
-                                vpn_routes_vmx1.append(subnets.get('subnet'))
-                                logger.info(vpn_routes_vmx1)
-                            break
-                        elif i['hubId'] == vmx2_id:
-                            for subnets in networks['exportedSubnets']:
-                                logger.info('Meraki Dashboard: Found routes for vMX2 hub')
-                                vpn_routes_vmx2.append(subnets.get('subnet'))
-                                logger.info(vpn_routes_vmx2)
-                            break
-                else:
-                    logger.info('Meraki Dashboard: No routes found for vMX Hubs')
-                    pass 
+        if networks['networkId'] == vmx1_id or networks['networkId'] == vmx2_id:
+            continue
+
+        for subnets in networks['exportedSubnets']:
+            logger.info('Meraki Dashboard: Found routes')
+            vpn_routes_vmx1.append(subnets.get('subnet'))
+            logger.info(vpn_routes_vmx1)
+
+            vpn_routes_vmx2.append(subnets.get('subnet'))
+            logger.info(vpn_routes_vmx2)
+
     return vpn_routes_vmx1, vpn_routes_vmx2
 
 def get_meraki_tagged_networks(dashboard, org_id, vmx_tag):
